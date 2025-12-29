@@ -1,13 +1,13 @@
 --- Cemi UI Main Drawing Logic ---
 
-local ICUI = require "Cemi_UI.Internal"
+local ICUI = require "CUI.Internal"
 
 local CUI = {}
-CUI.Widget = require "Cemi_UI.Widgets.Widget"
-CUI.Alignment = require "Cemi_UI.Widgets.Alignment"
-CUI.Box = require "Cemi_UI.Widgets.Box"
-CUI.Button = require "Cemi_UI.Widgets.Button"
-CUI.Text = require "Cemi_UI.Widgets.Text"
+CUI.Widget = require "CUI.Widgets.Widget"
+CUI.Alignment = require "CUI.Widgets.Alignment"
+CUI.Box = require "CUI.Widgets.Box"
+CUI.Button = require "CUI.Widgets.Button"
+CUI.Text = require "CUI.Widgets.Text"
 
 
 --- TODO ---
@@ -61,21 +61,22 @@ function CUI.draw(scene)
     --- first caluclate sizes ---
     
     -- fit pass
-    ICUI.fit_elements(ICUI.elem_list, "width")
-    ICUI.fit_elements(ICUI.elem_list, "height")
+    ICUI.fit_elements(ICUI.elem_list, 'width')
+    ICUI.fit_elements(ICUI.elem_list, 'height')
 
     -- fill pass
-    ICUI.expand_elements(ICUI.elem_list, "width")
-    ICUI.expand_elements(ICUI.elem_list, "height")
+    ICUI.expand_elements(ICUI.elem_list, 'width')
+    ICUI.expand_elements(ICUI.elem_list, 'height')
 
     --- Set positions based on sizes ---
-    ICUI.place_elements(ICUI.elem_list, "width")
-    ICUI.place_elements(ICUI.elem_list, "height")
+    ICUI.place_elements(ICUI.elem_list, 'width')
+    ICUI.place_elements(ICUI.elem_list, 'height')
 
     --- Draw elements ---
     ICUI.draw_elements(ICUI.elem_list)
 
     love.graphics.setColor(r,g,b,a)
+    return
 end
 
 --------------------------------

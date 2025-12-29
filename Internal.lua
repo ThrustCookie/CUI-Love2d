@@ -20,7 +20,7 @@ function ICUI.get_tree(root)
         -- get all the children into a list in order of a depth first search
         
         elem_list[#elem_list+1] = table.remove(remaining, 1)
-
+        
         for i = #elem_list[#elem_list].children, 1, -1 do
             local child = elem_list[#elem_list].children[i]
             
@@ -30,8 +30,7 @@ function ICUI.get_tree(root)
                     child ~= value, -- if child is already element on list give error
                     tostring(elem_list[#elem_list]) .. ": has child: ".. tostring(child) .." which is already referenced"
                 )
-            end
-            
+            end     
             table.insert(remaining, 1, child)
         end
     end

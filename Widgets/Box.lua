@@ -1,6 +1,6 @@
 --- Cemi UI Box Widget ---
 
-local Widget = require "Cemi_UI.Widgets.Widget"
+local Widget = require "CUI.Widgets.Widget"
 local id = 1
 
 --- definitions ---
@@ -10,7 +10,7 @@ local id = 1
     ---@field fill_mode "fill" | "line"
     ---@field color tablelib
     ---@field rounding {x:number, y:number}
-local Box = Widget:new("Box", false)
+local Box = Widget:new(false)
 Box.fill_mode = "fill"
 Box.color = {1, 1, 1, 1}
 Box.rounding = {x = 0, y = 0}
@@ -31,14 +31,13 @@ end
 
 --- overrides ---
 
----@param name string | nil
 ---@return Box
-function Box:new(name)
-    local t = Widget:new("Box", false)
+function Box:new()
+    local t = Widget:new(false)
     setmetatable(t, self)
     self.__index = self
 
-    t.name = name or t.name
+    t:set_size(15)
     t.id = id ---@diagnostic disable-line
     id = id + 1
 
@@ -47,7 +46,7 @@ end
 
 function Box:__tostring()
     ---@diagnostic disable-next-line
-    return "<".. self.name ..": ".. self.id ..">" 
+    return string.format("<Box: %i>", self.id)
 end
 
 

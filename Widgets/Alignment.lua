@@ -1,6 +1,6 @@
 --- Cemi UI Alignment Widget ---
 
-local Widget = require "Cemi_UI.Widgets.Widget"
+local Widget = require "CUI.Widgets.Widget"
 local id = 1
 
 --- definitions ---
@@ -10,19 +10,17 @@ local id = 1
 ---@class Alignment : Widget
     ---@field spacing number
     ---@field direction "Top to Bottom" | "Left to Right" 
-local Alignment = Widget:new("Alignment", false)
+local Alignment = Widget:new(false)
 Alignment.direction = "Top to Bottom" -- Direction in which children are laid out
 Alignment.spacing = 0 -- spacing between children
 
 
----@param name string | nil
 ---@return Alignment
-function Alignment:new(name)
-    local t = Widget:new("Alignment", false)
+function Alignment:new()
+    local t = Widget:new(false)
     setmetatable(t, self)
     self.__index = self
     
-    t.name = name or Alignment.name
     t.id = id ---@diagnostic disable-line private
     id = id + 1
     
@@ -33,7 +31,7 @@ end
 
 function Alignment:__tostring()
     ---@diagnostic disable-next-line
-    return "<".. self.name ..": ".. self.id ..">"
+    return string.format("< Alignment: %i>", self.id)
 end
 
 ---@param direction direction_options

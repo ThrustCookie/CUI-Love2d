@@ -1,6 +1,6 @@
 --- Cemi UI Text Widget ---
 
-local Widget = require "Cemi_UI.Widgets.Widget"
+local Widget = require "CUI.Widgets.Widget"
 
 ---TODO Add fit sizing that automatically changes the text's size
 
@@ -9,7 +9,7 @@ local Widget = require "Cemi_UI.Widgets.Widget"
 ---@field text string
 ---@field color tablelib
 ---@field __internalTextLines string[]
-local Text = Widget:new("Text", false)
+local Text = Widget:new( false)
 Text.content = "Default Text"
 Text.wrap_limit = 500
 Text.color = {1, 1, 1, 1}
@@ -44,7 +44,7 @@ end
 
 ---@return Text
 function Text:new()
-    local t = Widget:new("Text", false)
+    local t = Widget:new(false)
     setmetatable(t, self)
     self.__index = self
     

@@ -1,6 +1,6 @@
 --- Cemi UI Button Widget ---
 
-local Widget = require "Cemi_UI.Widgets.Widget"
+local Widget = require "CUI.Widgets.Widget"
 
 local id = 1
 
@@ -16,7 +16,7 @@ local id = 1
 ---@field pressed boolean
 ---@field OnPressed function
 ---@field OnReleased function
-local Button = Widget:new("Button", false)
+local Button = Widget:new(false)
 
 Button.color = {1, 1, 1, 1}
 Button.basic_color = {1, 1, 1, 1}
@@ -60,21 +60,20 @@ end
 
 --- overrides ---
 
----@param name string | nil
-function Button:new(name)
-    local t = Widget:new("Button", false)
+---@return Button
+function Button:new()
+    local t = Widget:new(false)
     setmetatable(t, self)
     self.__index = self
 
-    t.name = name or t.name
     t.id = id ---@diagnostic disable-line
     id = id + 1
 
-    return t
+    return t ---@diagnostic disable-line
 end
 
 function Button:__tostring()
-    return "<".. self.name ..": ".. self.id ..">" ---@diagnostic disable-line
+    return string.format("< Button: %i>", self.id)---@diagnostic disable-line
 end
 
 return Button

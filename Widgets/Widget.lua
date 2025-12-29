@@ -27,7 +27,6 @@ local Sizing = {
 }
 
 ---@class Widget
-    ---@field name string
     ---@field protected id number
     ---@field position {x:number,y:number} -- the x and y position of the widget
     ---@field __internal_position {x:number,y:number} 
@@ -36,7 +35,6 @@ local Sizing = {
     ---@field children Widget[] -- child widgets contained within this widget
 local Widget = {}
 
-Widget.name = "Widget"
 Widget.id = 0
 Widget.position = {x=0,y=0}
 Widget.__internal_position = {x=0,y=0}
@@ -46,17 +44,14 @@ Widget.children = {}
 
 
 -- initalize widget
----@param name string | nil
 ---@param incrementID boolean | nil
 ---@return Widget
-function Widget:new(name, incrementID)
+function Widget:new(incrementID)
     local t = {} -- t for template
     setmetatable(t, self)
     self.__index = self
 
     -- Setup debug text
-    name = name or Widget.name
-    t.name = name 
     t.id = id
     if incrementID or incrementID == nil then
         id = id + 1
@@ -74,7 +69,7 @@ function Widget:new(name, incrementID)
 end
 
 function Widget:__tostring()
-    return "<".. self.name ..": ".. self.id ..">"
+    return string.format("< Widget: %i>", self.id)
 end
 
 ---@param padding number | Padding | {x:number,y:number}
@@ -183,13 +178,14 @@ function Widget:set_size(value)
     
 end
 
+local CUI = require "CUI.Internal"
+
 --- Setup children, returns added child index
 ---@param child Widget
 ---@return integer
 function Widget:add_child(child)
     self.children[#self.children+1] = child
     
-    local CUI = require "Cemi_UI.Internal"
     CUI.refresh_tree()
     return #self.children
 end
