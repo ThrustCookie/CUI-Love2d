@@ -1,6 +1,7 @@
 --- Cemi UI Button Widget ---
 
-local Widget = require "CUI.Widgets.Widget"
+local relative_root = "External."
+local Widget = require (relative_root.."CUI.Widgets.Widget")
 
 local id = 1
 

@@ -1,14 +1,17 @@
 --- Cemi UI Main Drawing Logic ---
 
-local ICUI = require "CUI.Internal"
+-- somehow get the path for where this file is located
+
 
 local CUI = {}
-CUI.Widget = require "CUI.Widgets.Widget"
-CUI.Alignment = require "CUI.Widgets.Alignment"
-CUI.Box = require "CUI.Widgets.Box"
-CUI.Button = require "CUI.Widgets.Button"
-CUI.Text = require "CUI.Widgets.Text"
+CUI.relative_root = "External."
+CUI.Widget = require (CUI.relative_root.."CUI.Widgets.Widget")
+CUI.Alignment = require (CUI.relative_root.."CUI.Widgets.Alignment")
+CUI.Box = require (CUI.relative_root.."CUI.Widgets.Box")
+CUI.Button = require (CUI.relative_root.."CUI.Widgets.Button")
+CUI.Text = require (CUI.relative_root.."CUI.Widgets.Text")
 
+local ICUI = require (CUI.relative_root.."CUI.Internal")
 
 --- TODO ---
 --- image

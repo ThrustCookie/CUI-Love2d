@@ -1,6 +1,7 @@
 --- Cemi UI Text Widget ---
 
-local Widget = require "CUI.Widgets.Widget"
+local relative_root = "External."
+local Widget = require (relative_root.."CUI.Widgets.Widget")
 
 ---TODO Add fit sizing that automatically changes the text's size
 
