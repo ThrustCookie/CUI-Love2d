@@ -5,11 +5,11 @@
 
 local CUI = {}
 local relative_root = require "root_path"
-CUI.Widget = require (relative_root.."Widgets.Widget")
-CUI.Alignment = require (relative_root.."Widgets.Alignment")
-CUI.Box = require (relative_root.."Widgets.Box")
-CUI.Button = require (relative_root.."Widgets.Button")
-CUI.Text = require (relative_root.."Widgets.Text")
+CUI.Widget = require (relative_root.."Widgets.Widget") ---@type Widget
+CUI.Alignment = require (relative_root.."Widgets.Alignment") ---@type Alignment
+CUI.Box = require (relative_root.."Widgets.Box") ---@type Box
+CUI.Button = require (relative_root.."Widgets.Button") ---@type Button
+CUI.Text = require (relative_root.."Widgets.Text") ---@type Text
 
 local ICUI = require (relative_root.."Internal")
 

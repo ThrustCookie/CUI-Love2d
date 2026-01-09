@@ -181,14 +181,17 @@ end
 local relative_root = require "root_path"
 local CUI = require (relative_root.."Internal")
 
---- Setup children, returns added child index
----@param child Widget
----@return integer
-function Widget:add_child(child)
-    self.children[#self.children+1] = child
-    
+--- Setup children,
+--- returns the first added child index and how many were added
+---@param ... Widget
+---@return integer , integer
+function Widget:add_child(...)
+    for index, widget in ipairs({...}) do
+        self.children[#self.children+1] = widget
+    end
+
     CUI.refresh_tree()
-    return #self.children
+    return #self.children - #{...}, #{...}
 end
 
 
