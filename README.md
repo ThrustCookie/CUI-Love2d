@@ -4,6 +4,7 @@ This library is based on video by Nic barker: [How Clay's UI Layout Algorithm Wo
 
 ## How to use
 You can copy or git clone this library directly into any project.
+Change the root path to wherever you have your library located.
 To implement it you'll need the following functions in your main.lua:
 
 CUI.draw(scene) is incharge of the rendering. *scene* can be any **widget** made with this library.

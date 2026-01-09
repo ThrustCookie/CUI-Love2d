@@ -178,8 +178,8 @@ function Widget:set_size(value)
     
 end
 
-local relative_root = "External."
-local CUI = require (relative_root.."CUI.Internal")
+local relative_root = require "root_path"
+local CUI = require (relative_root.."Internal")
 
 --- Setup children, returns added child index
 ---@param child Widget

@@ -4,14 +4,14 @@
 
 
 local CUI = {}
-CUI.relative_root = "External."
-CUI.Widget = require (CUI.relative_root.."CUI.Widgets.Widget")
-CUI.Alignment = require (CUI.relative_root.."CUI.Widgets.Alignment")
-CUI.Box = require (CUI.relative_root.."CUI.Widgets.Box")
-CUI.Button = require (CUI.relative_root.."CUI.Widgets.Button")
-CUI.Text = require (CUI.relative_root.."CUI.Widgets.Text")
+local relative_root = require "root_path"
+CUI.Widget = require (relative_root.."Widgets.Widget")
+CUI.Alignment = require (relative_root.."Widgets.Alignment")
+CUI.Box = require (relative_root.."Widgets.Box")
+CUI.Button = require (relative_root.."Widgets.Button")
+CUI.Text = require (relative_root.."Widgets.Text")
 
-local ICUI = require (CUI.relative_root.."CUI.Internal")
+local ICUI = require (relative_root.."Internal")
 
 --- TODO ---
 --- image
