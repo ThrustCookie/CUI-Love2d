@@ -1,6 +1,7 @@
 # CUI-Love2d
 CUI or Cemi UI is a Love2D UI layout library.
-This library is based on video by Nic barker: [How Clay's UI Layout Algorithm Works](https://youtu.be/by9lQvpvMIc?si=x-HM9oVEFAFbntmM).
+The ui elements use a parent children tree structure with some set rules to align themselves.
+The main algorithm is based on video by Nic barker: [How Clay's UI Layout Algorithm Works](https://youtu.be/by9lQvpvMIc?si=x-HM9oVEFAFbntmM).
 
 ## How to use
 You can copy or git clone this library directly into any project.
