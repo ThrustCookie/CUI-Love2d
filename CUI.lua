@@ -37,34 +37,37 @@ local ICUI = require(relative_root.."Internal")
 --- draw
 --------------------------------
 
+local do_once = false
+
 ---@param scene Widget
 function CUI.draw(scene)
     local r,g,b,a = love.graphics.getColor()
     
+    
     if ICUI.root ~= scene then -- if scene changed
         ICUI.root = scene
-
+        
         ICUI.refresh_tree()
     end
+
     --- first caluclate sizes ---
     
     -- fit pass
     ICUI.fit_elements(ICUI.elem_list, 'width')
     ICUI.fit_elements(ICUI.elem_list, 'height')
-
+    
     -- fill pass
     ICUI.expand_elements(ICUI.elem_list, 'width')
     ICUI.expand_elements(ICUI.elem_list, 'height')
-
+    
     --- Set positions based on sizes ---
     ICUI.place_elements(ICUI.elem_list, 'width')
     ICUI.place_elements(ICUI.elem_list, 'height')
-
+    
     --- Draw elements ---
     ICUI.draw_elements(ICUI.elem_list)
-
+    
     love.graphics.setColor(r,g,b,a)
-    return
 end
 
 --------------------------------

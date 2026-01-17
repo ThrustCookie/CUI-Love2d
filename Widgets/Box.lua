@@ -10,7 +10,7 @@ local Widget = require (relative_root.."Widgets.Widget") ---@type Widget
     ---@field fill_mode 'fill' | 'line'
     ---@field color {[1]:number,[2]:number,[3]:number,[4]:number?}
     ---@field rounding {x:number, y:number}
-local Box = {}
+local Box = setmetatable({}, Widget)
 local default_size = 100
 
 ---@class Box_Template : Widget_Template
@@ -29,8 +29,7 @@ function Box:new(template)
     template = template or {size = default_size}
     template.size = template.size or default_size
     
-    local t = Widget:new(template) ---@cast t Box
-    setmetatable(t, Box)
+    local t = setmetatable(Widget:new(template), Box) ---@cast t Box
     self.__index = Box
 
     --- default values

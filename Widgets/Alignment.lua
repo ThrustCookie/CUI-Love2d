@@ -10,13 +10,13 @@ local Widget = require (relative_root.."Widgets.Widget") ---@type Widget
     ---@field direction 'Top to Bottom' | 'Left to Right' 
     -- spacing between children
     ---@field spacing number
-local Alignment = {}
+local Alignment = setmetatable({}, Widget)
 
 ---@class Alignment_Template : Widget_Template
     ---@field direction? 'Top to Bottom' | 'Left to Right'
     ---@field spacing? integer
 
----@param template Alignment_Template
+---@param template? Alignment_Template
 ---@return Alignment
 function Alignment:new(template)
     local t = Widget:new(template) ---@cast t Alignment

@@ -37,10 +37,6 @@ function ICUI.get_tree(root)
         end
     end
 
-    for _, widget in ipairs(elem_list) do
-        print(widget)
-    end
-
     return elem_list
 end
 

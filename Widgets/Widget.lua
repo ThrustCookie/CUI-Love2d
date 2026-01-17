@@ -31,6 +31,73 @@ local Sizing = {
     ---@field padding Padding
     ---@field children Widget[] -- child widgets contained within this widget
 local Widget = {}
+Widget.__index = Widget
+
+---@class Widget_Template
+    ---@field position?
+        ---|number
+        ---|{[1]:number,[2]:number}
+        ---|{x:number,y:number}
+    ---@field size?
+        ---|number 
+        ---|'Fill'
+        ---|'Fit'
+        ---|sizeMinMax
+        ---|{width:number|'Fill'|'Fit'|sizeMinMax,height:number|'Fill'|'Fit'|sizeMinMax}
+--- TODO: make padding not need to have any direction could be nil ej. just top and left 
+    ---@field padding?
+        ---|number
+        ---|Padding
+        ---|{[1]:number,[2]:number}
+        ---|{x:number,y:number}
+    ---@field children?
+        ---|Widget[]
+
+-- initalize widget
+---@param template? Widget_Template
+---@return Widget
+function Widget:new(template)
+    local t = setmetatable({}, Widget)
+
+    -- Setup debug identifier
+    t.id = id
+    id = id+1
+    
+    -- makes new tables for all the variables with references
+    -- this makes it so they dont keep referencing the same table and modifiying it
+
+    t.relative_position = {x=0,y=0}
+    t.global_position = {x=0,y=0}
+    t.size = Sizing.new()
+    t.padding = { left = 0, right = 0, top = 0, down = 0 }
+    t.children = {}
+
+    if template == nil then return t end
+
+    if template.padding then
+        t:set_padding(template.padding)
+        template.padding = nil
+    end
+
+    if template.size then
+        t:set_size(template.size)
+        template.size = nil
+    end
+
+    if template.position then
+        t:set_position(template.position)
+        template.position = nil
+    end
+
+    if template.children then
+        for _, child in ipairs(template.children) do
+            t:add_child(child)
+        end
+        template.children = nil
+    end
+
+    return t
+end
 
 function Widget:__tostring()
     return string.format("<Widget: %i>", self.id)
@@ -63,9 +130,9 @@ function Widget:set_padding(padding)
 
     elseif 
         padding.left ~= nil 
-        and padding.right ~= nil 
-        and padding.top ~= nil 
-        and padding.down ~= nil 
+        and padding.right ~= nil
+        and padding.top ~= nil
+        and padding.down ~= nil
     then
         self.padding.left = padding.left
         self.padding.right = padding.right
@@ -252,75 +319,6 @@ function Widget:place_children(direction)
             child.relative_position[axis]
             + offset
     end
-end
-
----@class Widget_Template
-    ---@field position?
-        ---|number
-        ---|{[1]:number,[2]:number}
-        ---|{x:number,y:number}
-    ---@field size?
-        ---|number 
-        ---|'Fill'
-        ---|'Fit'
-        ---|sizeMinMax
-        ---|{width:number|'Fill'|'Fit'|sizeMinMax,height:number|'Fill'|'Fit'|sizeMinMax}
---- TODO: make padding not need to have any direction could be nil ej. just top and left 
-    ---@field padding?
-        ---|number
-        ---|Padding
-        ---|{[1]:number,[2]:number}
-        ---|{x:number,y:number}
-    ---@field children?
-        ---|Widget[]
-
--- initalize widget
----@param template Widget_Template | nil
----@return Widget
-function Widget:new(template)
-
-    local t = {}
-    setmetatable(t, Widget)
-    self.__index = Widget
-
-    -- Setup debug identifier
-    t.id = id
-    id = id+1
-    
-    -- makes new tables for all the variables with references
-    -- this makes it so they dont keep referencing the same table and modifiying it
-
-    t.relative_position = {x=0,y=0}
-    t.global_position = {x=0,y=0}
-    t.size = Sizing.new()
-    t.padding = { left = 0, right = 0, top = 0, down = 0 }
-    t.children = {}
-
-    if template == nil then return t end
-
-    if template.padding then
-        t:set_padding(template.padding)
-        template.padding = nil
-    end
-
-    if template.size then
-        t:set_size(template.size)
-        template.size = nil
-    end
-
-    if template.position then
-        t:set_position(template.position)
-        template.position = nil
-    end
-
-    if template.children then
-        for _, child in ipairs(template.children) do
-            t:add_child(child)
-        end
-        template.children = nil
-    end
-
-    return t
 end
 
 return Widget
