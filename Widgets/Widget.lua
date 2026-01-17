@@ -1,8 +1,6 @@
 --- abstract logic for other UI elements ---
 
-local id = 1
-
-----@alias sizing_options 'Fixed'|'Fill'|"size_to_content"
+local id = 0
 
 ---@alias direction_options 'width' | 'height'
 ---@alias sizing_options 'Fixed'|'Fill'|'Fit'
@@ -19,62 +17,36 @@ local id = 1
 local Sizing = {
     new = function()
         return {
-            width = { value = 0, mode = 'Fixed', min = nil, max = nil },
-            height = { value = 0, mode = 'Fixed', min = nil, max = nil }
+            width = { value = 0, mode = 'Fit', min = nil, max = nil },
+            height = { value = 0, mode = 'Fit', min = nil, max = nil }
         }
     end
-    
 }
 
 ---@class Widget
     ---@field protected id number
-    ---@field position {x:number,y:number} -- the x and y position of the widget
-    ---@field __internal_position {x:number,y:number} 
+    ---@field relative_position {x:number,y:number} -- the x and y relative_position of the widget
+    ---@field global_position {x:number,y:number} 
     ---@field size Sizing
     ---@field padding Padding
     ---@field children Widget[] -- child widgets contained within this widget
 local Widget = {}
 
-Widget.id = 0
-Widget.position = {x=0,y=0}
-Widget.__internal_position = {x=0,y=0}
-Widget.size = Sizing.new()
-Widget.padding = { left = 0, right = 0, top = 0, down = 0 }
-Widget.children = {}
-
-
--- initalize widget
----@param incrementID boolean | nil
----@return Widget
-function Widget:new(incrementID)
-    local t = {} -- t for template
-    setmetatable(t, self)
-    self.__index = self
-
-    -- Setup debug text
-    t.id = id
-    if incrementID or incrementID == nil then
-        id = id + 1
-    end
-    
-
-    -- make new tables for all the variables with references
-    -- this makes it so they dont keep referencing the same table and modifiying it
-    t.position = {x=0,y=0}
-    t.__internal_position = {x=0,y=0}
-    t.size = Sizing.new()
-    t.padding = { left = 0, right = 0, top = 0, down = 0 }
-    t.children = {}
-    return t
+function Widget:__tostring()
+    return string.format("<Widget: %i>", self.id)
 end
 
-function Widget:__tostring()
-    return string.format("< Widget: %i>", self.id)
+---comment
+---@param self Widget
+---@param template Widget_Template
+---@return Widget
+function Widget:__call(template)
+    return self:new(template)
 end
 
 ---@param padding number | Padding | {x:number,y:number}
 function Widget:set_padding(padding)
-    if type(padding) == "number" then -- if only one number is given
+    if type(padding) == 'number' then -- if only one number is given
         for index, _ in next, self.padding do -- set all sides to that number
             self.padding[index] = padding 
         end
@@ -100,100 +72,133 @@ function Widget:set_padding(padding)
         self.padding.top = padding.top
         self.padding.down = padding.down
     else
-        error( tostring(self) .. " padding is set incorrectly with value of " .. tostring(padding))
+        error(string.format(
+            "%s padding is set incorrectly with value of %s",
+            tostring(self),
+            tostring(padding)
+        ))
     end
 end
 
----@alias sizeMinMax {mode: 'Fill'|'Fit', min: nil|number, max: nil|number}
+---@alias sizeMinMax {mode:'Fill'|'Fit',min:number?,max:number?}
 
----@param value 
+---@param size 
 ---| number 
 ---| 'Fill'
 ---| 'Fit'
 ---| sizeMinMax
----| {width: number|'Fill'|'Fit'|sizeMinMax, height: number|'Fill'|'Fit'|sizeMinMax}
-function Widget:set_size(value)
+---| {[1]:number|'Fill'|'Fit'|sizeMinMax,[2]:number|'Fill'|'Fit'|sizeMinMax}
+---| {width:number|'Fill'|'Fit'|sizeMinMax,height:number|'Fill'|'Fit'|sizeMinMax}
+function Widget:set_size(size)
+    
     local dirs = {'width', 'height'} ---@type direction_options[]
 
-    if type(value) == "number" then
-        self.size.width.value = value
+    if type(size) == 'number' then
+        self.size.width.value = size
         self.size.width.mode = 'Fixed'
-        self.size.height.value = value
+        self.size.height.value = size
         self.size.height.mode = 'Fixed'
 
-    elseif type(value) == "string" then
+    elseif type(size) == 'string' then
         self.size.width.value = 0
-        self.size.width.mode = value
+        self.size.width.mode = size
         self.size.height.value = 0
-        self.size.height.mode = value
+        self.size.height.mode = size
     
-    elseif value.mode ~= nil then
+    elseif size.mode ~= nil then
         for i = 1, 2, 1 do
             self.size[dirs[i]].value = 0
-            self.size[dirs[i]].mode = value.mode
+            self.size[dirs[i]].mode = size.mode
 
-            if value[dirs[i]].min ~= nil then
-                self.size[dirs[i]].value = value[dirs[i]].min
-                self.size[dirs[i]].min = value[dirs[i]].min
+            if size[dirs[i]].min ~= nil then
+                self.size[dirs[i]].value = size[dirs[i]].min
+                self.size[dirs[i]].min = size[dirs[i]].min
             end
             
-            if value[dirs[i]].max ~= nil then
-                self.size[dirs[i]].max = value[dirs[i]].max
+            if size[dirs[i]].max ~= nil then
+                self.size[dirs[i]].max = size[dirs[i]].max
             end
         end
         
-    elseif value.width ~= nil and value.height ~= nil then
+    elseif size.width ~= nil and size.height ~= nil then
+        --- TODO: rework this code at some point, its too complicated
+
         for i = 1, 2, 1 do
             
-            if type(value[dirs[i]]) == 'number' then
-                self.size[dirs[i]].value = value[dirs[i]]
+            if type(size[dirs[i]]) == 'number' then
+                self.size[dirs[i]].value = size[dirs[i]]
                 self.size[dirs[i]].mode = 'Fixed'
 
-            elseif type(value[dirs[i]]) == "string" then
+            elseif type(size[dirs[i]]) == 'string' then
                 self.size[dirs[i]].value = 0
-                self.size[dirs[i]].mode = value[dirs[i]]
+                self.size[dirs[i]].mode = size[dirs[i]]
             
-            elseif value[dirs[i]].mode ~= nil then
+            elseif size[dirs[i]].mode ~= nil then
                 self.size[dirs[i]].value = 0
-                self.size[dirs[i]].mode = value.mode
+                self.size[dirs[i]].mode = size.mode
     
-                if value.min ~= nil then
-                    self.size[dirs[i]].value = value.min
-                    self.size[dirs[i]].min = value.min
+                if size.min ~= nil then
+                    self.size[dirs[i]].value = size.min
+                    self.size[dirs[i]].min = size.min
                 end
                 
-                if value.max ~= nil then
-                    self.size[dirs[i]].max = value.max
+                if size.max ~= nil then
+                    self.size[dirs[i]].max = size.max
                 end
             else
-                error("wrong size bro, fix!")
+                error("Sizing set incorrectly for "..tostring(self))
             end
         end
-        
-
-    else
-        error("you setting size wrong bro! --2am programming")
-
+    else 
+        error("Sizing set incorrectly for "..tostring(self)) 
     end
     
 end
 
+---@param position
+---|number
+---|{[1]:integer,[2]:integer}
+---|{x:integer,y:integer}
+function Widget:set_position(position)
+    if type(position) == 'number' then
+        self.relative_position = {x = position, y = position}
+
+    elseif 
+        position.x ~= nil
+        and position.y ~= nil
+    then
+        self.relative_position = {x = position.x, y = position.y}
+
+    elseif #position == 2 then
+        assert (
+        type(position[1]) == 'number' and type(position[1]) == 'number',
+        "Position set incorrectly"
+        )
+        self.relative_position = {x = position[1], y = position[2]}
+
+    else 
+        error("Position set incorrectly")
+    end
+end
+
 local relative_root = require "root_path"
-local CUI = require (relative_root.."Internal")
+local ICUI = require (relative_root.."Internal")
 
 --- Setup children,
 --- returns the first added child index and how many were added
 ---@param ... Widget
----@return integer , integer
+---@return integer, integer
 function Widget:add_child(...)
-    for index, widget in ipairs({...}) do
+    for _, widget in ipairs({...}) do
         self.children[#self.children+1] = widget
     end
 
-    CUI.refresh_tree()
+    ICUI.refresh_tree()
     return #self.children - #{...}, #{...}
 end
 
+
+--- Internal functions
 
 ---@param direction direction_options
 function Widget:fit(direction)
@@ -201,10 +206,10 @@ function Widget:fit(direction)
     local axis
     local pad_dir
     if direction == 'width' then
-        axis = "x"
-        pad_dir = {"right", "left"}
+        axis = 'x'
+        pad_dir = {'right', 'left'}
     else -- if direction is height
-        axis = "y"
+        axis = 'y'
         pad_dir = {'top', 'down'}
     end
     
@@ -217,7 +222,7 @@ function Widget:fit(direction)
         biggestChildSize = 
             math.max(
                 biggestChildSize,
-                child.position[axis] + child.size[direction].value
+                child.relative_position[axis] + child.size[direction].value
             )
     end
     calc_size = calc_size + biggestChildSize
@@ -240,13 +245,82 @@ function Widget:place_children(direction)
 
     
 
-    offset = offset + self.__internal_position[axis]
+    offset = offset + self.global_position[axis]
 
     for _, child in ipairs(self.children) do
-        child.__internal_position[axis] = 
-            child.position[axis]
+        child.global_position[axis] = 
+            child.relative_position[axis]
             + offset
     end
+end
+
+---@class Widget_Template
+    ---@field position?
+        ---|number
+        ---|{[1]:number,[2]:number}
+        ---|{x:number,y:number}
+    ---@field size?
+        ---|number 
+        ---|'Fill'
+        ---|'Fit'
+        ---|sizeMinMax
+        ---|{width:number|'Fill'|'Fit'|sizeMinMax,height:number|'Fill'|'Fit'|sizeMinMax}
+--- TODO: make padding not need to have any direction could be nil ej. just top and left 
+    ---@field padding?
+        ---|number
+        ---|Padding
+        ---|{[1]:number,[2]:number}
+        ---|{x:number,y:number}
+    ---@field children?
+        ---|Widget[]
+
+-- initalize widget
+---@param template Widget_Template | nil
+---@return Widget
+function Widget:new(template)
+
+    local t = {}
+    setmetatable(t, Widget)
+    self.__index = Widget
+
+    -- Setup debug identifier
+    t.id = id
+    id = id+1
+    
+    -- makes new tables for all the variables with references
+    -- this makes it so they dont keep referencing the same table and modifiying it
+
+    t.relative_position = {x=0,y=0}
+    t.global_position = {x=0,y=0}
+    t.size = Sizing.new()
+    t.padding = { left = 0, right = 0, top = 0, down = 0 }
+    t.children = {}
+
+    if template == nil then return t end
+
+    if template.padding then
+        t:set_padding(template.padding)
+        template.padding = nil
+    end
+
+    if template.size then
+        t:set_size(template.size)
+        template.size = nil
+    end
+
+    if template.position then
+        t:set_position(template.position)
+        template.position = nil
+    end
+
+    if template.children then
+        for _, child in ipairs(template.children) do
+            t:add_child(child)
+        end
+        template.children = nil
+    end
+
+    return t
 end
 
 return Widget

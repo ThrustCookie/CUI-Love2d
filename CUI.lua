@@ -4,14 +4,25 @@
 
 
 local CUI = {}
+---@type string
 local relative_root = require "root_path"
-CUI.Widget = require (relative_root.."Widgets.Widget") ---@type Widget
-CUI.Alignment = require (relative_root.."Widgets.Alignment") ---@type Alignment
-CUI.Box = require (relative_root.."Widgets.Box") ---@type Box
-CUI.Button = require (relative_root.."Widgets.Button") ---@type Button
-CUI.Text = require (relative_root.."Widgets.Text") ---@type Text
 
-local ICUI = require (relative_root.."Internal")
+---@type Widget
+CUI.Widget = require(relative_root.."Widgets.Widget"):new()
+
+---@type Alignment
+CUI.Alignment = require(relative_root.."Widgets.Alignment"):new()
+
+---@type Box
+CUI.Box = require(relative_root.."Widgets.Box"):new()
+
+---@type Button
+CUI.Button = require(relative_root.."Widgets.Button"):new()
+
+---@type Text
+CUI.Text = require(relative_root.."Widgets.Text"):new()
+
+local ICUI = require(relative_root.."Internal")
 
 --- TODO ---
 --- image
@@ -20,33 +31,7 @@ local ICUI = require (relative_root.."Internal")
 --- Fill sizing that doesnt size all elements equally
 --- collision for button based on object (can leave for later)
 --- 
---- 
---- i am hating actually implementing anything with this library, its too verbose
---- do the add_child() and make it take any ammount of parameters to aleviate this
---- 
---- in this function process and apply the metatables to each item
---- 
---- q? how to define class type to then set the metatable for?
---- 
---- have field for it like
---- 
---- constructer function?
---- 
---- param of the type it belongs to
---- CUI.Text({param here})
---- CUI.Widget({})
---- CUI.Button({})
---- 
---- {
---- "type" = {objet here}
---- "type" = {}
---- }
---- 
---- CUI:Set_size
---- or process it internally in the add_child() function
---- 
---- use lua multiple variable definitions instead of objects
-
+--- make the Widget:new() function take the current objects variables as the defaults
 
 --------------------------------
 --- draw

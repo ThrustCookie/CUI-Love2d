@@ -27,12 +27,18 @@ function ICUI.get_tree(root)
             --- check if child is already in list
             for _, value in ipairs(elem_list) do -- might make this a hashtable
                 assert(
-                    child ~= value, -- if child is already element on list give error
-                    tostring(elem_list[#elem_list]) .. ": has child: ".. tostring(child) .." which is already referenced"
-                )
-            end     
+                    child ~= value,
+                    string.format(
+                        "%s has child: %s which is already referenced",   tostring(elem_list[#elem_list]), tostring(child)
+                    )
+                ) -- if child is already element on list give error
+            end
             table.insert(remaining, 1, child)
         end
+    end
+
+    for _, widget in ipairs(elem_list) do
+        print(widget)
     end
 
     return elem_list
@@ -59,7 +65,7 @@ end
 ---@param direction direction_options
 function ICUI.fit_elements(elem_list, direction)
     for listIndex = #elem_list, 1, -1 do
-        if elem_list[listIndex].size[direction].mode == "Fit" then 
+        if elem_list[listIndex].size[direction].mode == 'Fit' then 
             elem_list[listIndex]:fit(direction)
         end
     end
@@ -78,14 +84,14 @@ function ICUI.expand_elements(elem_list, direction)
         
         local leftover_size = widget.size[direction].value
 
-        local pad_dir = {"left", "right"} -- asume the direction is width
-        if direction == "height" then pad_dir = {"top", "down"} end
+        local pad_dir = {'left', 'right'} -- asume the direction is width
+        if direction == 'height' then pad_dir = {'top', 'down'} end
         leftover_size = leftover_size - widget.padding[pad_dir[1]] - widget.padding[pad_dir[2]]
 
         local fill_children = {}
         
         for _, child in ipairs(widget.children) do
-            if child.size[direction].mode == "Fill" then
+            if child.size[direction].mode == 'Fill' then
                 fill_children[#fill_children+1] = child
             end
         end
@@ -103,8 +109,8 @@ function ICUI.expand_elements(elem_list, direction)
 
         if 
             not 
-            (direction =="width" and widget.direction == "Left to Right" or
-            direction =="height" and widget.direction == "Top to Bottom")
+            (direction =='width' and widget.direction == 'Left to Right' or
+            direction =='height' and widget.direction == 'Top to Bottom')
         then
             for _, child in ipairs(fill_children) do
                 child.size[direction].value = leftover_size
@@ -115,7 +121,7 @@ function ICUI.expand_elements(elem_list, direction)
         leftover_size = leftover_size - widget.spacing*(#widget.children-1)
         
         for _, child in ipairs(widget.children) do
-            if child.size[direction].mode ~= "Fill" then
+            if child.size[direction].mode ~= 'Fill' then
                 leftover_size = leftover_size - child.size[direction].value
             end
         end
