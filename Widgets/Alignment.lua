@@ -85,12 +85,6 @@ function Alignment:place_children(direction)
     end
 end
 
----@param template Alignment_Template
----@return Alignment
-function Alignment:__call(template)
-    return self:new(template)
-end
-
 ---@param direction direction_options
 function Alignment:fit(direction)
     --- calculations for adequate padding and axis to make my life easier

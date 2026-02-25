@@ -68,12 +68,6 @@ function Box:new(template)
     return t
 end
 
----@param template Box_Template
----@return Box
-function Box:__call(template)
-    return self:new(template)
-end
-
 function Box:__tostring()
     return string.format("<Box: %i>", self.id)
 end

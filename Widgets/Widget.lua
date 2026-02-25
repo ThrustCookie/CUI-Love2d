@@ -103,14 +103,6 @@ function Widget:__tostring()
     return string.format("<Widget: %i>", self.id)
 end
 
----comment
----@param self Widget
----@param template Widget_Template
----@return Widget
-function Widget:__call(template)
-    return self:new(template)
-end
-
 ---@param padding number | Padding | {x:number,y:number}
 function Widget:set_padding(padding)
     if type(padding) == 'number' then -- if only one number is given

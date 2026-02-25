@@ -24,8 +24,6 @@ Text.content = "Default Text"
 Text.wrap_limit = 500
 Text.font = love.graphics.newFont(12)
 
-
-
 function Text:draw()
     love.graphics.setColor(self.color)
     love.graphics.setFont(self.font)
@@ -82,12 +80,6 @@ function Text:new(template)
     
     updateText(t)
     return t
-end
-
----@param template Text_Template
----@return Text
-function Text:__call(template)
-    return self:new(template)
 end
 
 function Text:__tostring()

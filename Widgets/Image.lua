@@ -4,7 +4,6 @@
 local relative_root = require "root_path"
 local Widget = require (relative_root.."Widgets.Widget") ---@type Widget
 
----comment
 ---@param self Image
 ---@param new_img any
 local function set_image(self, new_img)
@@ -54,12 +53,6 @@ function Image:new(template)
         t.tint = template.tint
     end
     return t
-end
-
----@param template Image_Template
----@return Image
-function Image:__call(template)
-    return self:new(template)
 end
 
 function Image:__tostring()
