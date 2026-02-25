@@ -75,7 +75,7 @@ function Alignment:place_children(direction)
     else
         
         for _, child in ipairs(self.children) do
-            child.global_position[axis] = offset
+            child.global_position[axis] = offset + child.relative_position[axis]
             
             offset = 
                 offset

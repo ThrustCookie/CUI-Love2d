@@ -264,6 +264,46 @@ function Widget:add_child(...)
     return #self.children - #{...}, #{...}
 end
 
+--- Setup children,
+--- returns the first added child index and how many were added
+---@param index integer
+---@param ... Widget
+---@return integer, integer
+function Widget:add_child_at(index, ...)
+    for i, widget in ipairs({...}) do
+        table.insert(self.children, i-1 + index, widget)
+    end
+
+    ICUI.refresh_tree()
+    return #self.children - #{...}, #{...}
+end
+
+
+
+--- Remove children,
+--- returns the first added child index and how many were added
+---@param widget Widget
+---@param delete? boolean
+function Widget:remove_child(widget, delete)
+    local widget_found = false
+
+    for index, child in ipairs(self.children) do
+        if child == widget then
+            table.remove(self.children, index)
+            goto finished
+        end
+    end
+
+    error(string.format(
+        "Widget %s not found as child of %s",
+        tostring(widget),
+        tostring(self))
+    )
+
+    ::finished::
+    ICUI.refresh_tree()
+end
+
 
 --- Internal functions
 
