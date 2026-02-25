@@ -2,8 +2,6 @@
 
 -- somehow get the path for where this file is located
 
--- change all the CUI.Widget calls into functions which return a the respective widget
-
 
 local CUI = {}
 ---@type string
@@ -11,38 +9,53 @@ local relative_root = require "root_path"
 
 ---@type Widget
 CUI.Widget = require(relative_root.."Widgets.Widget"):new()
+---@param template Widget_Template
+---@return Widget
+function CUI:widget(template) return self.Widget:new(template) end
 
 ---@type Alignment
 CUI.Alignment = require(relative_root.."Widgets.Alignment"):new()
+---@param template Alignment_Template
+---@return Alignment
+function CUI:alignment(template) return self.Alignment:new(template) end
 
 ---@type Box
 CUI.Box = require(relative_root.."Widgets.Box"):new()
+---@param template Box_Template
+---@return Box
+function CUI:box(template) return self.Box:new(template) end
 
 ---@type Button
 CUI.Button = require(relative_root.."Widgets.Button"):new()
+---@param template Button_Template
+---@return Button
+function CUI:button(template) return self.Button:new(template) end
 
 ---@type Text
 CUI.Text = require(relative_root.."Widgets.Text"):new()
+---@param template Text_Template
+---@return Text
+function CUI:text(template) return self.Text:new(template) end
 
 ---@type Image
 CUI.Image = require(relative_root.."Widgets.Image"):new()
+---@param template Image_Template
+---@return Image
+function CUI:image(template) return self.Image:new(template) end
 
 local ICUI = require(relative_root.."Internal")
 
 --- TODO ---
---- image
 --- center start and end align
 --- min and max sizing
 --- Fill sizing that doesnt size all elements equally
 --- collision for button based on object (can leave for later)
 --- 
---- make the Widget:new() function take the current objects variables as the defaults
+--- make the Widget:new() function take the current object's variables as the defaults
 
 --------------------------------
 --- draw
 --------------------------------
-
-local do_once = false
 
 ---@param scene Widget
 function CUI.draw(scene)

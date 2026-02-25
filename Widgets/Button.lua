@@ -18,7 +18,7 @@ local Widget = require (relative_root.."Widgets.Widget") ---@type Widget
     ---@field OnReleased function
 local Button = setmetatable({}, Widget)
 
----@class Template_Button : Widget_Template
+---@class Button_Template : Widget_Template
     ---@field color? {[1]:number,[2]:number,[3]:number,[4]:number?}
     ---@field hovered_color? {[1]:number,[2]:number,[3]:number,[4]:number?}
     ---@field pressed_color? {[1]:number,[2]:number,[3]:number,[4]:number?}
@@ -31,7 +31,7 @@ local Button = setmetatable({}, Widget)
     ---@field OnPressed? function
     ---@field OnReleased? function
 
----@param template? Template_Button
+---@param template? Button_Template
 ---@return Button
 function Button:new(template)
     local t = setmetatable(Widget:new(template), Button)---@cast t Button
