@@ -4,6 +4,23 @@
 local relative_root = require "root_path"
 local Widget = require (relative_root.."Widgets.Widget") ---@type Widget
 
+---comment
+---@param self Image
+---@param new_img any
+local function set_image(self, new_img)
+    local img_obj
+    if type(new_img) == 'string' then
+        local image_data = love.image.newImageData(new_img)
+        local width, height = image_data:getDimensions()
+        self:set_size({width = width, height = height})
+        img_obj = love.graphics.newImage(image_data)
+
+    else --- IDK
+        img_obj = love.graphics.newImage(new_img)
+    end
+    rawset(self, [[img]], img_obj)
+end
+
 --- definitions ---
 
 --- Image Widget displays an image with a specified path
@@ -30,14 +47,7 @@ function Image:new(template)
     end
     
     if template.img then
-        if type(template.img) == 'string' then
-            local image_data = love.image.newImageData(template.img)
-            local width, height = image_data:getDimensions()
-            t:set_size({width = width, height = height})
-            t.img = love.graphics.newImage(image_data)
-        else
-            t.img = love.graphics.newImage(template.img)
-        end
+        set_image(t, template.img)
     end
 
     if template.tint then
@@ -54,6 +64,15 @@ end
 
 function Image:__tostring()
     return string.format("<Image: %i>", self.id)
+end
+
+function Image:__index(key, value)
+    if key == [[img]] then
+        set_image(self, value)
+    else
+        rawset(self, key, value)
+    end
+    
 end
 
 function Image:draw()
