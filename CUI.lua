@@ -43,9 +43,15 @@ CUI.Image = require(relative_root.."Widgets.Image"):new()
 ---@return Image
 function CUI:image(template) return self.Image:new(template) end
 
+---@type Scalar
+CUI.Scalar = require(relative_root.."Widgets.Scalar"):new()
+---@param template Scalar_Template
+---@return Scalar
+function CUI:scalar(template) return self.Scalar:new(template) end
+
 local ICUI = require(relative_root.."Internal")
 
---- TODO ---
+--- @TODO
 --- center start and end align
 --- min and max sizing
 --- Fill sizing that doesnt size all elements equally
@@ -60,7 +66,6 @@ local ICUI = require(relative_root.."Internal")
 ---@param scene Widget
 function CUI.draw(scene)
     local r,g,b,a = love.graphics.getColor()
-    
     
     if ICUI.root ~= scene then -- if scene changed
         ICUI.root = scene

@@ -148,7 +148,6 @@ function ICUI.place_elements(elem_list, direction)
     end
 end
 
-
 --------------------------------
 --- draw_elements
 --------------------------------
@@ -156,7 +155,41 @@ end
 --- draw all elements in element_list
 ---@param elem_list tablelib
 function ICUI.draw_elements(elem_list)
+    local saved_scales = {}
+
     for _, element in ipairs(elem_list) do
+        if element.scale ~= nil then
+            if #saved_scales == 0 then
+                love.graphics.push()
+                print("push")
+            end
+
+            saved_scales[#saved_scales+1] = {
+                scale = element.scale,
+                child_num = #ICUI.get_tree(element) + 1
+            }
+            
+            local curr_scale = saved_scales[#saved_scales].scale
+            love.graphics.scale(curr_scale.x, curr_scale.y)
+        end
+
+        if #saved_scales > 0 then
+            for i, saved_scale in ipairs(saved_scales) do
+                saved_scale.child_num = saved_scale.child_num-1
+                if saved_scale.child_num == 0 then
+                    love.graphics.scale(
+                        1/saved_scale.scale.x,
+                        1/saved_scale.scale.y
+                    )
+                    table.remove(saved_scales, i)
+                end
+            end
+
+            if #saved_scales == 0 then
+                love.graphics.pop()
+                print("pop")
+            end
+        end
         if element.draw ~= nil then
             element:draw()
         end

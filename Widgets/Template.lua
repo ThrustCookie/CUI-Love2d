@@ -3,26 +3,18 @@
 local relative_root = require "root_path"
 local Widget = require (relative_root.."Widgets.Widget") ---@type Widget
 
-
 --- Description
----@class Type : Widget
+---@class temp : Widget
+local temp = setmetatable({}, Widget)
+
+---@class temp_Template : Widget_Template
+
+---@param template? temp_Template
+---@return temp
+function temp:new(template)
     
-local Type = setmetatable({}, Widget)
-
-
-
----@class Type_Template : Widget_Template
-
----@param template? Type_Template
----@return Text
-function Type:new(template)
-    
-    local t = setmetatable(Widget:new(template), Type) ---@cast t Text
+    local t = setmetatable(Widget:new(template), temp) ---@cast t temp
     self.__index = self
-    
-    t.color = {1, 1, 1}
-    t.size.height.mode = 'Fixed'
-    t.size.width.mode = 'Fixed'
     
     if template == nil then
         return t
@@ -37,8 +29,8 @@ function Type:new(template)
     return t
 end
 
-function Type:__tostring()
-    return string.format("<Text: %i>", self.id)
+function temp:__tostring()
+    return string.format("<temp: %i>", self.id) ---@diagnostic disable-line
 end
 
-return Type
+return temp
