@@ -2,6 +2,8 @@
 
 -- somehow get the path for where this file is located
 
+-- change all the CUI.Widget calls into functions which return a the respective widget
+
 
 local CUI = {}
 ---@type string
@@ -21,6 +23,9 @@ CUI.Button = require(relative_root.."Widgets.Button"):new()
 
 ---@type Text
 CUI.Text = require(relative_root.."Widgets.Text"):new()
+
+---@type Image
+CUI.Image = require(relative_root.."Widgets.Image"):new()
 
 local ICUI = require(relative_root.."Internal")
 
