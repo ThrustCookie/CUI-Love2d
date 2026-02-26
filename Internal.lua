@@ -157,22 +157,35 @@ end
 function ICUI.draw_elements(elem_list)
     local saved_scales = {}
 
+    ---@param element Widget
     for _, element in ipairs(elem_list) do
+        ---@cast element Scalar
         if element.scale ~= nil then
             if #saved_scales == 0 then
                 love.graphics.push()
-                print("push")
             end
 
             saved_scales[#saved_scales+1] = {
                 scale = element.scale,
-                child_num = #ICUI.get_tree(element) + 1
+                child_num = #ICUI.get_tree(element)
             }
             
             local curr_scale = saved_scales[#saved_scales].scale
+            love.graphics.translate(
+                element.global_position.x,
+                element.global_position.y
+            )
             love.graphics.scale(curr_scale.x, curr_scale.y)
-        end
+            love.graphics.translate(
+                -element.global_position.x,
+                -element.global_position.y
+            )
+        end ---@cast element -Scalar
 
+        ---@cast element Box | Button | Text
+        if element.draw ~= nil then
+            element:draw()
+        end
         if #saved_scales > 0 then
             for i, saved_scale in ipairs(saved_scales) do
                 saved_scale.child_num = saved_scale.child_num-1
@@ -187,11 +200,7 @@ function ICUI.draw_elements(elem_list)
 
             if #saved_scales == 0 then
                 love.graphics.pop()
-                print("pop")
             end
-        end
-        if element.draw ~= nil then
-            element:draw()
         end
     end
 end

@@ -65,6 +65,14 @@ function Scalar:__tostring()
     return string.format("<Scalar: %i>", self.id)
 end
 
---- ad a sizing or set size func here
+---@param direction direction_options
+function Scalar:fit(direction)
+    Widget.fit(self, direction) -- essentially a super func
+    local axis = 'y'
+    if direction == 'width' then
+        axis = 'x'
+    end
+    self.size[direction].value = self.size[direction].value * self.scale[axis]
+end
 
 return Scalar

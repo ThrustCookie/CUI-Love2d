@@ -270,19 +270,16 @@ function Widget:add_child_at(index, ...)
     return #self.children - #{...}, #{...}
 end
 
-
-
 --- Remove children,
 --- returns the first added child index and how many were added
 ---@param widget Widget
----@param delete? boolean
-function Widget:remove_child(widget, delete)
-    local widget_found = false
+function Widget:remove_child(widget)
 
     for index, child in ipairs(self.children) do
         if child == widget then
             table.remove(self.children, index)
-            goto finished
+            ICUI.refresh_tree()
+            return
         end
     end
 
@@ -291,9 +288,6 @@ function Widget:remove_child(widget, delete)
         tostring(widget),
         tostring(self))
     )
-
-    ::finished::
-    ICUI.refresh_tree()
 end
 
 

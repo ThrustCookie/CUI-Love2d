@@ -1,1 +1,0 @@
-text template shouldn't have a size option
