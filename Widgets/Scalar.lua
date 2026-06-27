@@ -51,19 +51,15 @@ function Scalar:new(template)
         end
         template.scale = nil
     end
-    
-    for key, value in pairs(template) do
-        if value ~= nil then
-            t[key] = value
-        end
-    end
-    
+
     return t
 end
 
 function Scalar:__tostring()
     return string.format("<Scalar: %i>", self.id)
 end
+
+Scalar.dotwice = 2
 
 ---@param direction direction_options
 function Scalar:fit(direction)
@@ -73,6 +69,10 @@ function Scalar:fit(direction)
         axis = 'x'
     end
     self.size[direction].value = self.size[direction].value * self.scale[axis]
+    if self.dotwice ~= 0 then
+        print(direction, self.size[direction].value)
+        self.dotwice = self.dotwice - 1
+    end
 end
 
 return Scalar

@@ -3,13 +3,6 @@
 local relative_root = require "root_path"
 local Widget = require (relative_root.."Widgets.Widget") ---@type Widget
 
----@param self Text
-local function updateText(self)
-    local width, textList = self.font:getWrap(self.content, self.wrap_limit)
-    rawset( self, [[__internalTextLines]], textList)
-    self:set_size({width = width, height = #textList * self.font:getHeight()})
-end
-
 ---TODO Add fit sizing that automatically changes the text's size
 
 --- Text Widget displays text on the screen
@@ -18,7 +11,7 @@ end
     ---@field __internalTextLines string[]
     ---@field wrap_limit number
     ---@field font any
-    ---@field color {[1]:number,[2]:number,[3]:number,[4]?:number}
+    ---@field color {[1]:number,[2]:number,[3]:number,[4]?:number?}
 local Text = setmetatable({}, Widget)
 Text.content = "Default Text"
 Text.wrap_limit = 500
@@ -36,16 +29,23 @@ function Text:draw()
     end
 end
 
-Text.__newindex = function(self, key, value)
+function Text:update()
+    local width, textList = self.font:getWrap(self.content, self.wrap_limit)
+    rawset( self, [[__internalTextLines]], textList)
+    self:set_size({width = width, height = #textList * self.font:getHeight()})
+end
+
+---@TODO this doesn't fire after the vars are set in the template
+function Text:__newindex(key, value)
 
     rawset(self, key, value)
 
-    if 
+    if
         key == [[content]] or
         key == [[wrap_limit]] or
         key == [[font]]
     then
-        updateText(self)
+        self:update()
     end
 end
 
@@ -59,7 +59,6 @@ end
 ---@param template? Text_Template
 ---@return Text
 function Text:new(template)
-    
     local t = setmetatable(Widget:new(template), Text) ---@cast t Text
     self.__index = self
     
@@ -68,17 +67,22 @@ function Text:new(template)
     t.size.width.mode = 'Fixed'
     
     if template == nil then
-        updateText(t)
+        t:update()
         return t
     end
+
+    local attributes = {
+        'content',
+        'wrap_limit',
+        'font',
+        'color',
+    }
     
-    for key, value in pairs(template) do
-        if value ~= nil then
-            t[key] = value
-        end
+    for _, attr in ipairs(attributes) do
+        if template[attr] then t[attr] = template[attr] end
     end
     
-    updateText(t)
+    t:update()
     return t
 end
 

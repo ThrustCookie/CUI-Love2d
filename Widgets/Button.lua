@@ -48,26 +48,37 @@ function Button:new(template)
         return t
     end
 
-    for key, value in pairs(template) do
-        if value == nil then
-            -- dont do anything
-            
-        elseif key == [[rounding]] then
-            if type(value) == 'number' then
-                t.rounding.x = value
-                t.rounding.y = value
+    local attributes = {
+        [[color]],
+        [[hovered_color]],
+        [[pressed_color]],
+        [[rounding]],
+        [[OnHovered]],
+        [[OnUnhovered]],
+        [[OnPressed]],
+        [[OnReleased]],
+    }
 
-            elseif value.x ~= nil and value.y ~= nil then
-                t.rounding = value
+    for _, attr in ipairs(attributes) do
+        local value = template[attr]
+        if value then
+            if attr == [[rounding]] then
+                if type(value) == 'number' then
+                    t.rounding.x = value
+                    t.rounding.y = value
 
-            elseif #value == 2 then
-                t.rounding.x = value[1]
-                t.rounding.y = value[2]
-            end
-        else
-            t[key] = value
-            if key == [[color]] then
-                t.basic_color = value
+                elseif value.x ~= nil and value.y ~= nil then
+                    t.rounding = value
+
+                elseif #value == 2 then
+                    t.rounding.x = value[1]
+                    t.rounding.y = value[2]
+                end
+            else
+                t[attr] = value
+                if attr == [[color]] then
+                    t.basic_color = value
+                end
             end
         end
     end

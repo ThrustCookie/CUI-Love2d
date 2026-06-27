@@ -76,24 +76,20 @@ function Widget:new(template)
 
     if template.padding then
         t:set_padding(template.padding)
-        template.padding = nil
     end
 
     if template.size then
         t:set_size(template.size)
-        template.size = nil
     end
 
     if template.position then
         t:set_position(template.position)
-        template.position = nil
     end
 
     if template.children then
         for _, child in ipairs(template.children) do
             t:add_child(child)
         end
-        template.children = nil
     end
 
     return t

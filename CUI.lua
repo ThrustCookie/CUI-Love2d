@@ -1,7 +1,7 @@
 --- Cemi UI Main Drawing Logic ---
 
 -- somehow get the path for where this file is located
-
+-- button OnReleased fires twice
 
 local CUI = {}
 ---@type string
@@ -9,45 +9,51 @@ local relative_root = require "root_path"
 
 ---@type Widget
 CUI.Widget = require(relative_root.."Widgets.Widget"):new()
----@param template Widget_Template
+---@param template? Widget_Template
 ---@return Widget
 function CUI:widget(template) return self.Widget:new(template) end
 
 ---@type Alignment
 CUI.Alignment = require(relative_root.."Widgets.Alignment"):new()
----@param template Alignment_Template
+---@param template? Alignment_Template
 ---@return Alignment
 function CUI:alignment(template) return self.Alignment:new(template) end
 
 ---@type Box
 CUI.Box = require(relative_root.."Widgets.Box"):new()
----@param template Box_Template
+---@param template? Box_Template
 ---@return Box
 function CUI:box(template) return self.Box:new(template) end
 
 ---@type Button
 CUI.Button = require(relative_root.."Widgets.Button"):new()
----@param template Button_Template
+---@param template? Button_Template
 ---@return Button
 function CUI:button(template) return self.Button:new(template) end
 
 ---@type Text
 CUI.Text = require(relative_root.."Widgets.Text"):new()
----@param template Text_Template
+---@param template? Text_Template
 ---@return Text
 function CUI:text(template) return self.Text:new(template) end
 
 ---@type Image
 CUI.Image = require(relative_root.."Widgets.Image"):new()
----@param template Image_Template
+---@param template? Image_Template
 ---@return Image
 function CUI:image(template) return self.Image:new(template) end
 
 ---@type Scalar
 CUI.Scalar = require(relative_root.."Widgets.Scalar"):new()
----@param template Scalar_Template
+---@param template? Scalar_Template
 ---@return Scalar
 function CUI:scalar(template) return self.Scalar:new(template) end
+
+---@type TextInput
+CUI.TextInput = require(relative_root.."Widgets.TextInput"):new()
+---@param template? TextInput_Template
+---@return TextInput
+function CUI:textInput(template) return self.TextInput:new(template) end
 
 local ICUI = require(relative_root.."Internal")
 
@@ -141,41 +147,52 @@ function CUI.check_for_interaction(type)
     if type == 'pressed' then
 
         for i = #ICUI.elem_list, 1, -1 do
-            local button = ICUI.elem_list[i] 
-            
-            ---@cast button Button
-            if button.bHovered == nil then goto continue end
-            
-            if button.bHovered == false then goto continue end
+            local widget = ICUI.elem_list[i]
 
-            button.bPressed = true
-            button:OnPressed()
+            if
+                ---@cast widget Button
+                widget.bHovered ~= nil
+            then
+                if widget.bHovered == false then goto continue end
+                widget.bPressed = true
+                widget:OnPressed()
 
-            button.color = button.pressed_color
-
+                widget.color = widget.pressed_color
+            elseif
+                ---@cast widget -Button 
+                ---@cast widget TextInput
+                widget.bEditing ~= nil
+            then
+                widget.bEditing = true
+            end
             ::continue::
         end
 
     else --- asume its released
         for _, button in ipairs(ICUI.elem_list) do
             ---@cast button Button
-            if button.bPressed == nil then goto continue end
-
-            if button.bPressed == false then goto continue end
-
-            button.bPressed = false
-            button:OnReleased()
-            
-            
-            if button.bHovered == true then
-                button.color = button.hovered_color
-            else 
-                button.color = button.basic_color
+            if button.bPressed ~= nil then 
+                if button.bPressed == false then goto continue end
+    
+                button.bPressed = false
+                button:OnReleased()
+                
+                
+                if button.bHovered == true then
+                    button.color = button.hovered_color
+                else 
+                    button.color = button.basic_color
+                end
             end
+
 
             ::continue::
         end
     end
+end
+
+function CUI.get_input(keypressed)
+
 end
 
 return CUI
