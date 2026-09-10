@@ -5,26 +5,25 @@ The main algorithm is based on video by Nic barker: [How Clay's UI Layout Algori
 
 ## How to use
 You can copy or git clone this library directly into any project.
-Change the root path to wherever you have your library located.
 To implement it you'll need the following functions in your main.lua:
 
-CUI.draw(scene) is incharge of the rendering. *scene* can be any **widget** made with this library.
+This is incharge of the rendering. *scene* can be any **widget** made with this library.
 ```lua
 function love.draw()
-    CUI.draw(scene)
+    CUI.scene.draw()
 end
 ```
 
 The following are used for the button widget, they get input from the mouse.
 ```lua
 function love.mousemoved( x, y, dx, dy, istouch )
-    CUI.check_for_collisions(x,y)
+    CUI.scene.check_for_collisions(x,y)
 end
 function love.mousepressed( x, y, button, istouch, presses )
-    CUI.check_for_interaction("pressed")
+    CUI.scene.check_for_interaction("pressed")
 end
 function love.mousereleased( x, y, button, istouch, presses )
-    CUI.check_for_interaction("released")
+    CUI.scene.check_for_interaction("released")
 end
 ```
 
@@ -49,4 +48,3 @@ This is a basic empty widget, it can be used to align or space other widgets.
 - Image Widget
 - Unequal spacing for the Fill option
 - Min and Max sizing options
-- ease of use for adding children

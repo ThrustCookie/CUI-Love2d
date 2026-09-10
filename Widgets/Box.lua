@@ -1,91 +1,95 @@
 --- Cemi UI Box Widget ---
 
-local relative_root = require "root_path"
-local Widget = require (relative_root.."Widgets.Widget") ---@type Widget
-
---- definitions ---
-
 --- Box Widget is a colored rectangle
 ---@class Box : Widget
-    ---@field fill_mode 'fill' | 'line'
-    ---@field color {[1]:number,[2]:number,[3]:number,[4]:number?}
-    ---@field rounding {x:number, y:number}
-local Box = setmetatable({}, Widget)
-local default_size = 100
+---@field private __fill_mode 'fill' | 'line'
+---@field private __color {[1]:number,[2]:number,[3]:number,[4]:number?}
+---@field private __rounding {x:number, y:number}
+---@field mode
+---| 'fill'
+---| 'line'
+---| widget_field
+---@field color
+---| number
+---| {[1]:number,[2]:number,[3]:number,[4]:number?}
+---| widget_field
+---@field rounding
+---| number
+---| {[1]:number,[2]:number}
+---| {x:number, y:number}
+---| widget_field
+local box = require ("Widgets.Widget"):extend()
+
+---------------
+--- Format Functions
+---------------
+
+function box.format.color(value)
+    if type(value) == 'number' then
+        return {value, value, value}
+    end
+
+    return value
+end
+
+function box.format.rounding(value)
+    if type(value) == 'number' then
+        return {x = value, y = value}
+    end
+    
+    if not type(value) == 'table' then error("Rounding set Incorrectly") end
+
+    if value[1] and value[2] then
+        return {x = value[1], y = value[2]}
+    end
+
+    return value
+end
 
 ---@class Box_Template : Widget_Template
-    ---@field fill_mode?
-        ---|'fill'
-        ---|'line'
-    ---@field rounding?
-        ---| number
-        ---| {x:number,y:number}
-        ---| {[1]:number,[2]:number}
-    ---@field color? {[1]:number,[2]:number,[3]:number,[4]:number?}
+---@field mode?
+---| 'fill'
+---| 'line'
+---| widget_field
+---@field rounding?
+---| number
+---| {x:number,y:number}
+---| {[1]:number,[2]:number}
+---| widget_field
+---@field color?
+---| number
+---| {[1]:number,[2]:number,[3]:number,[4]:number?}
+---| widget_field
 
----@param template? Box_Template
+---@param t? Box_Template
 ---@return Box
-function Box:new(template)
-    template = template or {size = default_size}
-    template.size = template.size or default_size
-    
-    local t = setmetatable(Widget:new(template), Box) ---@cast t Box
-    self.__index = Box
+function box.new(t)
+    t = t or {}
+    t.name = t.name or "Box"
+
+    local new_box = box:child_new(t)
+
+    new_box.__fill_mode   = 'fill'
+    new_box.__rounding    = box.format.rounding(0)
+    new_box.__color       = {.5, .5, .5}
 
     --- default values
-    t.fill_mode = 'fill'
-    t.rounding = {x = 0, y = 0}
-    t.color = {1, 1, 1, 1}
-    
-    if template.fill_mode then
-        t.fill_mode = template.fill_mode
-    end
-    if template.rounding then
-        ---@diagnostic disable
-        if type(template.rounding) == 'number' then
-            t.rounding.x = template.rounding
-            t.rounding.y = template.rounding
-        elseif 
-            template.rounding.x ~= nil
-            and template.rounding.y ~= nil
-        then
-            t.rounding = template.rounding
-        elseif #template.rounding == 2 then
-            assert(
-                type(template[1]) == 'number'
-                and type(template[2]) == 'number',
-                "Rounding set incorrectly for: "..tostring(t)
-            )
-        else
-            error("Rounding set incorrectly for "..tostring(t))
-        end
-        ---@diagnostic enable
-    end
-    if template.color then
-        t.color = template.color
-    end
-    
-    return t
+    new_box.mode        = t.mode or 'fill'
+    new_box.rounding    = t.rounding or 0
+    new_box.color       = t.color or 1
+
+    return new_box
 end
 
-function Box:__tostring()
-    return string.format("<Box: %i>", self.id)
-end
-
-function Box:draw()
+function box:visual()
     love.graphics.setColor(self.color)
     love.graphics.rectangle(
-        self.fill_mode,
-        self.global_position.x,
-        self.global_position.y,
-        self.size.width.value, 
-        self.size.height.value,
-        self.rounding.x,
-        self.rounding.y
+        'fill',
+        self.__global_position.x,
+        self.__global_position.y,
+        self.size.width.value,
+        self.size.height.value
     )
 end
 
-Box.fit = Widget.fit
-Box.place_children = Widget.place_children
-
-return Box
+return box
