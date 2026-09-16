@@ -28,9 +28,12 @@
 
 ---@class Widget : Object
 ---@field protected __name string
----@field protected __id number
+---@field protected __id integer
 ---@field protected __position {x:number,y:number}
 ---@field protected __global_position {x:number,y:number}
+---@field protected __scale {x:number,y:number}
+---@field protected __shear {x:number,y:number}
+---@field protected __rotation number
 ---@field protected __size Sizing
 ---@field protected __margin Margin
 ---@field visual? fun(self)
@@ -47,12 +50,17 @@
 ---| 'fit'
 ---| {mode: 'fill'|'fit', min?:number, max?:number} 
 
+---@alias vector 
+---| number
+---| {[1]:number,[2]:number}
+---| {x:number,y:number}
+---| widget_field
+
 ---@class Widget : Object
----@field position
-    ---| number
-    ---| {[1]:number,[2]:number}
-    ---| {x:number,y:number}
-    ---| widget_field
+---@field position vector
+---@field scale vector
+---@field shear vector
+---@field rotation number
 ---@field size
     ---| _sizing --- sets both height and width
     ---| {width: _sizing, height: _sizing}
@@ -79,13 +87,13 @@ local id = 1
 ---------------
 widget.format = {}
 
-function widget.format.position(value)
+function widget.format.vector(value)
     if type(value) == 'number' then
         return {x=value, y=value}
     end
 
     if not type(value) == 'table' then
-        return nil, "Position set incorrectly with value of "..tostring(value)
+        return nil, "vector set incorrectly with value of "..tostring(value)
     end
 
     if value[1] and value[2] then
@@ -96,6 +104,10 @@ function widget.format.position(value)
         return {x=value.x, y=value.y}
     end
 end
+
+widget.format.position = widget.format.vector
+widget.format.shear = widget.format.vector
+widget.format.scale = widget.format.vector
 
 function widget.format.size(value)
     if type(value) == 'number' then
@@ -273,11 +285,10 @@ end
 
 ---@class Widget_Template
 ---@field name? string
----@field position?
----| number
----| {[1]:number,[2]:number}
----| {x:number,y:number}
----| widget_field
+---@field position? vector
+---@field scale? vector
+---@field shear? vector
+---@field rotation? number
 ---@field size?
 ---| _sizing
 ---| {width:_sizing,height:_sizing}
@@ -308,11 +319,17 @@ function widget.new(t)
     w.__global_position = widget.format.position(0)
     w.__position        = widget.format.position(0)
     w.__size            = widget.format.size('fit')
+    w.__rotation        = widget.format.margin(0)
+    w.__scale           = widget.format.margin(0)
+    w.__shear           = widget.format.margin(0)
     w.__margin          = widget.format.margin(0)
     ---@diagnostic enable
 
     --initalize all values
     w.position  = t.position    or 0
+    w.rotation  = t.rotation    or 0
+    w.scale     = t.scale       or 1
+    w.shear     = t.shear       or 0
     w.size      = t.size        or 'fit'
     w.margin    = t.margin      or 0
     w.children  = t.children    or {}
@@ -528,10 +545,62 @@ function widget:__place_children(direction)
 end
 
 function widget:__draw_pass()
+    local stack_modified = false
+    if self.rotation ~= 0 then
+        if not stack_modified then love.graphics.push() end
+
+        stack_modified = true
+        
+        local x, y = love.graphics.inverseTransformPoint(
+            self.__global_position.x,self.__global_position.y
+        )
+        
+        x = x + self.size.width.value/2
+        y = y + self.size.height.value/2
+
+        love.graphics.translate(x,y)
+        love.graphics.rotate(self.rotation)
+        love.graphics.translate(-x,-y)
+    end
+    if self.scale.x ~= 1 or self.scale.y ~= 1 then
+        if not stack_modified then love.graphics.push() end
+        stack_modified = true
+
+        local x, y = love.graphics.inverseTransformPoint(
+            self.__global_position.x,self.__global_position.y
+        )
+        
+        x = x + self.size.width.value/2
+        y = y + self.size.height.value/2
+
+        love.graphics.translate(x,y)
+        love.graphics.scale(self.scale.x, self.scale.y)
+        love.graphics.translate(-x,-y)
+    end
+    if self.shear.x ~= 0 or self.shear.y ~= 0 then
+        if not stack_modified then love.graphics.push() end
+        stack_modified = true
+        local x, y = love.graphics.inverseTransformPoint(
+            self.__global_position.x,self.__global_position.y
+        )
+        
+        x = x + self.size.width.value/2
+        y = y + self.size.height.value/2
+
+        love.graphics.translate(x,y)
+        love.graphics.shear(self.shear.x, self.shear.y)
+        love.graphics.translate(-x,-y)
+        
+    end
+
     if self.visual then self:visual() end
 
     for _, child in ipairs(self.children) do
         child:__draw_pass()
+    end
+
+    if stack_modified then
+        love.graphics.pop()
     end
 end
 

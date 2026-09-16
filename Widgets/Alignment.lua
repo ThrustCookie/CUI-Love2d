@@ -19,12 +19,12 @@ function alignment.new(t)
     t = t or {}
     t.name = t.name or "Alignment"
 
-    local new_alignment = alignment:child_new(t)
+    local a = alignment:child_new(t)
 
-    new_alignment.direction = t.direction   or 'top to bottom'
-    new_alignment.spacing   = t.spacing     or 0
+    a.direction = t.direction   or 'top to bottom'
+    a.spacing   = t.spacing     or 0
 
-    return new_alignment
+    return a
 end
 
 

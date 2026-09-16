@@ -13,11 +13,7 @@
 ---| number
 ---| {[1]:number,[2]:number,[3]:number,[4]:number?}
 ---| widget_field
----@field rounding
----| number
----| {[1]:number,[2]:number}
----| {x:number, y:number}
----| widget_field
+---@field rounding vector
 local box = require[[Widgets.Widget]]:extend()
 
 ---------------
@@ -32,30 +28,14 @@ function box.format.color(value)
     return value
 end
 
-function box.format.rounding(value)
-    if type(value) == 'number' then
-        return {x = value, y = value}
-    end
-    
-    if not type(value) == 'table' then error("Rounding set Incorrectly") end
-
-    if value[1] and value[2] then
-        return {x = value[1], y = value[2]}
-    end
-
-    return value
-end
+box.format.rounding = box.format.vector
 
 ---@class Box_Template : Widget_Template
 ---@field mode?
 ---| 'fill'
 ---| 'line'
 ---| widget_field
----@field rounding?
----| number
----| {x:number,y:number}
----| {[1]:number,[2]:number}
----| widget_field
+---@field rounding? vector
 ---@field color?
 ---| number
 ---| {[1]:number,[2]:number,[3]:number,[4]:number?}
@@ -67,18 +47,18 @@ function box.new(t)
     t = t or {}
     t.name = t.name or "Box"
 
-    local new_box = box:child_new(t)
+    local b = box:child_new(t)
 
-    new_box.__fill_mode   = 'fill'
-    new_box.__rounding    = box.format.rounding(0)
-    new_box.__color       = {.5, .5, .5}
+    b.__fill_mode   = 'fill'
+    b.__rounding    = box.format.rounding(0)
+    b.__color       = {.5, .5, .5}
 
     --- default values
-    new_box.mode        = t.mode or 'fill'
-    new_box.rounding    = t.rounding or 0
-    new_box.color       = t.color or 1
+    b.mode        = t.mode or 'fill'
+    b.rounding    = t.rounding or 0
+    b.color       = t.color or 1
 
-    return new_box
+    return b
 end
 
 function box:visual()
@@ -88,7 +68,9 @@ function box:visual()
         self.__global_position.x,
         self.__global_position.y,
         self.size.width.value,
-        self.size.height.value
+        self.size.height.value,
+        self.rounding.x,
+        self.rounding.y
     )
 end
 
