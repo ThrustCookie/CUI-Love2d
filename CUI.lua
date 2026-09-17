@@ -1,3 +1,5 @@
+-- factor scale in the calculations
+
 local CUI = {}
 
 CUI.widget      = require [[Widgets.Widget]]    .new

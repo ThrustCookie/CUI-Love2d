@@ -75,6 +75,13 @@
     ---| {top?:number,down?:number,left?:number,right?:number}
     ---| Margin
     ---| widget_field
+---@field hovered boolean
+---@field pressed boolean
+---@field OnHovered fun(self:Widget)
+---@field OnUnhovered fun(self:Widget)
+---@field OnPressed fun(self:Widget)
+---@field OnReleased fun(self:Widget)
+---@field OnClicked fun(self:Widget)
 ---@field children
     ---| Widget[]
 local widget = require [[object]]:extend()
@@ -87,6 +94,10 @@ local id = 1
 ---------------
 widget.format = {}
 
+---formats a given input into a vector
+---@param value number | {[1]:number, [2]:number} | {x:number, y:number}
+---@return {x:number, y:number}
+---@return string
 function widget.format.vector(value)
     if type(value) == 'number' then
         return {x=value, y=value}
@@ -254,8 +265,6 @@ end
 ---@param key string
 ---@return any
 function widget:__index(key)
-    --if key == 'format' then return widget.format end
-
     local value = rawget(self, '__'..key) -- private key value
 
     -- if no private key exists
@@ -301,6 +310,11 @@ end
 ---| {[1]:number,[2]:number}
 ---| {top?:number,down?:number,left?:number,right?:number}
 ---| widget_field
+---@field OnHovered? fun(self:Widget)
+---@field OnUnhovered? fun(self:Widget)
+---@field OnPressed? fun(self:Widget)
+---@field OnReleased? fun(self:Widget)
+---@field OnClicked? fun(self:Widget)
 ---@field children? Widget[]
 
 -- initalize widget
@@ -316,12 +330,12 @@ function widget.new(t)
     id = id+1
 
     ---@diagnostic disable
-    w.__global_position = widget.format.position(0)
-    w.__position        = widget.format.position(0)
+    w.__global_position = widget.format.vector(0)
+    w.__position        = widget.format.vector(0)
+    w.__scale           = widget.format.vector(1)
+    w.__shear           = widget.format.vector(0)
+    w.__rotation        = 0
     w.__size            = widget.format.size('fit')
-    w.__rotation        = widget.format.margin(0)
-    w.__scale           = widget.format.margin(0)
-    w.__shear           = widget.format.margin(0)
     w.__margin          = widget.format.margin(0)
     ---@diagnostic enable
 
@@ -333,7 +347,12 @@ function widget.new(t)
     w.size      = t.size        or 'fit'
     w.margin    = t.margin      or 0
     w.children  = t.children    or {}
-
+    
+    w.OnHovered     = t.OnHovered
+    w.OnUnhovered   = t.OnUnhovered
+    w.OnPressed     = t.OnPressed
+    w.OnReleased    = t.OnReleased
+    w.OnClicked     = t.OnClicked
     return w
 end
 
@@ -400,6 +419,10 @@ function widget:remove_child(child)
     )
 end
 
+------------
+-- tecnical
+------------
+
 --- draws a widget as the root
 --- this runs all the sizing and position logic
 ---@param isroot? boolean
@@ -419,9 +442,23 @@ function widget:draw(isroot)
     self:__draw_pass()
 end
 
+function widget:mousemoved(x, y)
+    self:__collision_pass(x,y)
+end
+
+---Sends the widget mouse interactions
+---@param interaction 'pressed' | 'released'
+function widget:mouse(interaction)
+    self:__interaction_pass(interaction)
+end
+
 -------------------------
 --- Internal functions
 -------------------------
+
+--------------
+--- sizing
+--------------
 
 ---@alias direction_options 'width' | 'height'
 
@@ -514,6 +551,10 @@ function widget:__do_children_have_sizing(direction, mode)
 end
 
 
+--------------
+--- location
+--------------
+
 ---@param direction direction_options
 function widget:__place_pass(direction)
     if #self.children == 0 then return end
@@ -544,6 +585,121 @@ function widget:__place_children(direction)
     end
 end
 
+--------------
+--- Interaction
+--------------
+
+local reverse_table = function (t)
+    local i = #t+1
+    return function ()
+        i = i - 1
+        if i > 0 then return t[i] end
+    end
+end
+
+function widget:__collision_pass(x,y,parent_scale)
+    local scale = parent_scale or widget.format.vector(1)
+    scale = {x=scale.x, y=scale.y}
+
+    if self.children then
+        local child_collided = false
+        for child in reverse_table(self.children) do
+            if child_collided then
+                self:__stop_hovering()
+            else
+                if child:__collision_pass(x,y,scale) then
+                    child_collided = true
+                end
+            end
+        end
+        
+        if child_collided then
+            if self.hovered then
+                self.hovered = false
+            end
+            return true
+        end
+    end
+
+
+    if
+        self.OnHovered or
+        self.OnUnhovered or
+        self.OnPressed or
+        self.OnReleased or
+        self.OnClicked
+    then
+
+        local colliding =
+            x >= self.__global_position.x
+        and x <= self.__global_position.x + (self.size.width.value * scale.x)
+        and y >= self.__global_position.y
+        and y <= self.__global_position.y + (self.size.height.value * scale.y)
+
+        if colliding then
+            if self.hovered then return end
+
+            self.hovered = true
+            if self.OnHovered then self:OnHovered() end
+
+            return true --- collided
+        else
+            self:__stop_hovering()
+            return false
+        end
+    end
+    
+end
+
+function widget:__stop_hovering()
+    if not self.hovered then return end
+
+    self.hovered = false
+    if self.OnUnhovered then self:OnUnhovered() end
+end
+
+---Sends the widget mouse interactions
+---@param interaction 'pressed' | 'released'
+function widget:__interaction_pass(interaction)
+    self["__"..interaction](self)
+end
+
+function widget:__released()
+    for child in reverse_table(self.children) do
+        if child:__released() then return true end
+    end
+
+    if self.pressed then
+        self.pressed = false
+
+        if self.OnClicked then if self.hovered then self:OnClicked() end end
+
+        if self.OnReleased then self:OnReleased() end
+
+        return true
+    end
+
+    return false
+end
+
+function widget:__pressed()
+    for child in reverse_table(self.children) do
+        if child:__pressed() then return true end
+    end
+
+    if self.hovered and not self.pressed then
+        self.pressed = true
+        if self.OnPressed then self:OnPressed() end
+        return true
+    end
+
+    return false
+end
+
+--------------
+--- visual
+--------------
+
 function widget:__draw_pass()
     local stack_modified = false
     if self.rotation ~= 0 then
@@ -570,8 +726,8 @@ function widget:__draw_pass()
             self.__global_position.x,self.__global_position.y
         )
         
-        x = x + self.size.width.value/2
-        y = y + self.size.height.value/2
+        --x = x + self.size.width.value/2
+        --y = y + self.size.height.value/2
 
         love.graphics.translate(x,y)
         love.graphics.scale(self.scale.x, self.scale.y)
@@ -603,5 +759,7 @@ function widget:__draw_pass()
         love.graphics.pop()
     end
 end
+
+--function widget:visual()
 
 return widget
