@@ -1,19 +1,14 @@
 --- Cemi UI Box Widget ---
 
+---@alias color {[1]:number,[2]:number,[3]:number,[4]:number?}
+
 --- Box Widget is a colored rectangle
 ---@class Box : Widget
----@field private __fill_mode 'fill' | 'line'
----@field private __color {[1]:number,[2]:number,[3]:number,[4]:number?}
----@field private __rounding {x:number, y:number}
----@field mode
----| 'fill'
----| 'line'
----| widget_field
----@field color
----| number
----| {[1]:number,[2]:number,[3]:number,[4]:number?}
----| widget_field
----@field rounding vector
+---@field protected __color color
+---@field protected __rounding {x:number, y:number}
+---@field mode 'fill' | 'line'
+---@field color number | color | widget_field
+---@field rounding vector | widget_field
 local box = require[[Widgets.Widget]]:extend()
 
 ---------------
@@ -31,15 +26,9 @@ end
 box.format.rounding = box.format.vector
 
 ---@class Box_Template : Widget_Template
----@field mode?
----| 'fill'
----| 'line'
----| widget_field
----@field rounding? vector
----@field color?
----| number
----| {[1]:number,[2]:number,[3]:number,[4]:number?}
----| widget_field
+---@field mode? 'fill' | 'line'
+---@field color? number | color | widget_field
+---@field rounding? vector | widget_field
 
 ---@param t? Box_Template
 ---@return Box
@@ -49,14 +38,13 @@ function box.new(t)
 
     local b = box:child_new(t)
 
-    b.__fill_mode   = 'fill'
     b.__rounding    = box.format.rounding(0)
-    b.__color       = {.5, .5, .5}
+    b.__color       = box.format.color(.75)
 
     --- default values
-    b.mode        = t.mode or 'fill'
-    b.rounding    = t.rounding or 0
-    b.color       = t.color or 1
+    b.mode        = t.mode      or 'fill'
+    b.rounding    = t.rounding  or 0
+    b.color       = t.color     or 1
 
     return b
 end
