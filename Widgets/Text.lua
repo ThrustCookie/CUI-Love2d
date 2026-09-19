@@ -86,7 +86,6 @@ function text:update()
     
     local width, textList = self.font:getWrap(self.content, self.wrap_limit)
     self.__internal_text_lines = textList
-    print(self.__internal_text_lines[1])
     self.size = ({width = width, height = #textList * self.font:getHeight()})
 end
 

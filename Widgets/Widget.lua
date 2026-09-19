@@ -301,15 +301,8 @@ end
 ---@field size?
 ---| _sizing
 ---| {width:_sizing,height:_sizing}
----| {x:_sizing,y:_sizing}
----| {[1]:_sizing,[2]:_sizing}
----| widget_field
----@field margin?
----| number
----| {x:number,y:number}
----| {[1]:number,[2]:number}
----| {top?:number,down?:number,left?:number,right?:number}
----| widget_field
+---| vector
+---@field margin? vector | {top?:number,down?:number,left?:number,right?:number}
 ---@field OnHovered? fun(self:Widget)
 ---@field OnUnhovered? fun(self:Widget)
 ---@field OnPressed? fun(self:Widget)
