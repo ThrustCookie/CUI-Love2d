@@ -2,7 +2,7 @@
 
 ---@alias reference {table:table, key:string}
 
----@alias widget_field reference | function
+---@alias widget_field reference | fun(self:Widget):any
 
 ---------------
 -- Stored values
@@ -62,19 +62,14 @@
 ---@field shear vector
 ---@field rotation number
 ---@field size
+    ---| vector
     ---| _sizing --- sets both height and width
     ---| {width: _sizing, height: _sizing}
-    ---| {x: _sizing, y: _sizing}
-    ---| {[1]: _sizing, [2]: _sizing}
     ---| Sizing
-    ---| widget_field
 ---@field margin
-    ---| number
-    ---| {x: number,y: number}
-    ---| {[1]:number,[2]:number}
+    ---| vector
     ---| {top?:number,down?:number,left?:number,right?:number}
     ---| Margin
-    ---| widget_field
 ---@field hovered boolean
 ---@field pressed boolean
 ---@field OnHovered fun(self:Widget)
@@ -275,7 +270,7 @@ function widget:__index(key)
             return self.format[key](value.table[value.key])
         end
     elseif type(value) == 'function' then
-        return self.format[key](value())
+        return self.format[key](value(self))
     end
 
     return value
@@ -298,10 +293,7 @@ end
 ---@field scale? vector
 ---@field shear? vector
 ---@field rotation? number
----@field size?
----| _sizing
----| {width:_sizing,height:_sizing}
----| vector
+---@field size? _sizing | {width:_sizing,height:_sizing} | vector
 ---@field margin? vector | {top?:number,down?:number,left?:number,right?:number}
 ---@field OnHovered? fun(self:Widget)
 ---@field OnUnhovered? fun(self:Widget)

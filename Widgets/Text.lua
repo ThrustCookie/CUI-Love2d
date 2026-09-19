@@ -100,7 +100,7 @@ function text:visual()
         love.graphics.print(
             line,
             self.__global_position.x,
-            self.__global_position.y + (i * self.font:getHeight())
+            self.__global_position.y + ((i-1) * self.font:getHeight())
         )
     end
 end
