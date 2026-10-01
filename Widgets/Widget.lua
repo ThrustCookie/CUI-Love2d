@@ -36,7 +36,9 @@
 ---@field protected __rotation number
 ---@field protected __size Sizing
 ---@field protected __margin Margin
+---@field protected __children Margin
 ---@field visual? fun(self)
+---@field parent? Widget
 ---@field format {[string]:fun(value: any): any?, string?}
 
 --------------------
@@ -233,6 +235,7 @@ function widget:__newindex(key, value)
         return
     end
 
+    
     if type(value) == 'function' then
         rawset(self, '__'..key, value)
         return
@@ -240,6 +243,12 @@ function widget:__newindex(key, value)
         if value.table and value.key then
             rawset(self, '__'..key, value)
             return
+        end
+    end
+    
+    if key == 'children' then
+        for _, child in ipairs(value) do
+            child.parent = self
         end
     end
 
@@ -267,9 +276,19 @@ function widget:__index(key)
 
     if type(value) == 'table' then -- get value from reference
         if value.table and value.key then
+            if key == 'children' then
+                for _, child in ipairs(value) do
+                    child.parent = self
+                end
+            end
             return self.format[key](value.table[value.key])
         end
     elseif type(value) == 'function' then
+        if key == 'children' then
+            for _, child in ipairs(value) do
+                child.parent = self
+            end
+        end
         return self.format[key](value(self))
     end
 
@@ -367,6 +386,7 @@ end
 function widget:add_child(...)
     for _, w in ipairs({...}) do
         self.children[#self.children+1] = w
+        w.parent = self
     end
 
     return #self.children - #{...}, #{...}
@@ -478,7 +498,7 @@ function widget:__fit(direction)
     
     -- basic size is margin
     local calc_size = self.margin[pad_dir[1]] + self.margin[pad_dir[2]]
-    
+
     --- get farthest child ---
     local biggestChildSize = 0
     for _, child in next, self.children do ---@param child Widget
